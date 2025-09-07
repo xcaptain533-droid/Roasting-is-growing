@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RoastGPT Multiplayer 🔥</title>
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --panel: #1c1c20;
+      --accent: #ff4d4d;
+      --accent-2: #ffcc00;
+      --text: #f6f6f6;
+      --sub: #a5a5a5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 800px at 20% -10%, #1a0000 0%, #0f0f10 50%, #0f0f10 100%);
+      color: var(--text);
+      font: 16px/1.45 system-ui, Arial, sans-serif;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .app {
+      width: min(920px, 100%);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+    header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .flame {
+      font-size: 28px;
+      filter: drop-shadow(0 0 6px rgba(255,77,77,.6));
+    }
+    h1 {
+      margin: 0;
+      color: var(--accent);
+      letter-spacing: .5px;
+      text-shadow: 0 2px 10px rgba(255,77,77,.3);
+      font-weight: 800;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid #2a2a31;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    /* Chat */
+    .chat {
+      height: 480px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .messages {
+      flex: 1;
+      overflow: auto;
+      padding-right: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      word-wrap: break-word;
+      line-height: 1.35;
+    }
+    .msg.user {
+      background: #2b2b33;
+      border: 1px solid #3a3a44;
+      align-self: flex-start;
+    }
+    .msg.roast {
+      background: var(--accent);
+      color: #fff;
+      align-self: flex-end;
+      border: 1px solid #ff2a2a;
+      box-shadow: 0 6px 16px rgba(255,77,77,.35);
+    }
+    .inputRow {
+      display: grid;
+      grid-template-columns: 160px 1fr auto;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    input[type="text"] {
+      background: #131318;
+      color: var(--text);
+      border: 1px solid #2a2a31;
+      border-radius: 8px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    input::placeholder { color: var(--sub); }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: .3px;
+      box-shadow: 0 6px 16px rgba(255,77,77,.35);
+    }
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+
+    /* Leaderboard */
+    .board {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 480px;
+    }
+    .board h2 {
+      margin: 0;
+      color: var(--accent-2);
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(255,204,0,.3);
+    }
+    .scores {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .scores li {
+      display: grid;
+      grid-template-columns: 1.6rem 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #17171c;
+      border: 1px solid #2b2b31;
+      border-radius: 10px;
+    }
+    .rank {
+      width: 1.6rem;
+      height: 1.6rem;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #23232a;
+      color: #ddd;
+      font-weight: 800;
+      font-size: .9rem;
+    }
+    .top1 .rank { background: #ffd700; color: #000; box-shadow: 0 0 12px rgba(255,215,0,.6); }
+    .userTag { color: #eaeaea; font-weight: 700; }
+    .count { color: #cfcfcf; font-weight: 600; }
+    .hint {
+      text-align: center;
+      color: var(--sub);
+      font-size: 12px;
+      margin-top: auto;
+    }
+
+    /* Mobile */
+    @media (max-width: 820px) {
+      .app { grid-template-columns: 1fr; }
+      .chat, .board { height: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="flame">🔥</div>
+      <h1>RoastGPT Multiplayer</h1>
+    </header>
+
+    <section class="card chat">
+      <div id="messages" class="messages"></div>
+
+      <div class="inputRow">
+        <input id="username" type="text" placeholder="Your name (e.g., Roastee42)"/>
+        <input id="question" type="text" placeholder="Ask something to get roasted…"/>
+        <button id="sendBtn">Roast!</button>
+      </div>
+    </section>
+
+    <aside class="card board">
+      <h2>👑 Roast Leaderboard</h2>
+      <ul id="scores" class="scores"></ul>
+      <div class="hint">Top 1 glows in gold. Get roasted to climb. 🔥</div>
+    </aside>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const messagesEl = document.getElementById("messages");
+    const usernameEl = document.getElementById("username");
+    const questionEl = document.getElementById("question");
+    const sendBtn = document.getElementById("sendBtn");
+    const scoresEl = document.getElementById("scores");
+
+    function addMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = `msg ${type}`;
+      div.textContent = text;
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function renderBoard(data) {
+      scoresEl.innerHTML = "";
+      const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      sorted.forEach(([user, score], i) => {
+        const li = document.createElement("li");
+        if (i === 0) li.classList.add("top1");
+        li.innerHTML = `
+          <div class="rank">${i + 1}</div>
+          <div class="userTag">${user}</div>
+          <div class="count">${score} 🔥</div>
+        `;
+        scoresEl.appendChild(li);
+      });
+    }
+
+    function sendQuestion() {
+      const user = (usernameEl.value || "Anonymous").trim() || "Anonymous";
+      const text = (questionEl.value || "").trim();
+      if (!text) return;
+      socket.emit("question", { user, text });
+      questionEl.value = "";
+      questionEl.focus();
+    }
+
+    sendBtn.addEventListener("click", sendQuestion);
+    questionEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendQuestion();
+    });
+
+    socket.on("message", ({ text, type }) => addMessage(text, type));
+    socket.on("leaderboard", (data) => renderBoard(data));
+  </script>
+</body>
+</html>
