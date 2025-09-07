@@ -1,0 +1,16 @@
+{
+  "name": "roastgpt",
+  "version": "1.0.0",
+  "description": "A multiplayer roasting chat powered by Node.js + Socket.IO",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["roast", "chat", "socket.io", "funny", "multiplayer"],
+  "author": "You",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
